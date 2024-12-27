@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
 
-const MovieFavourites = () => {
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { filterWatchList, removeFromWatchList, searchWatchList, setSelectedGenreId, 
+    sortWatchList } from "../reducers/watchlist.reducer";
 
     let genreids = {
         28: "Action",
@@ -25,72 +27,45 @@ const MovieFavourites = () => {
       };
 
 
-      const [favourites, setFavourites] = useState([]);
-      const [filteredFavourites, setFilteredFavourites] = useState([]);
-      const [genres, setGenres] = useState([]);
-      const [selectedGenreId, setSelectedGenreId] = useState("");
 
 
-      useEffect(() => {
-      const favouritesData = JSON.parse(localStorage.getItem("favourites") || "[]"); 
-      // empty array is useful when favourites key is not present the code will not through error.
-      // favouritesData is inside the function. Therefore we cannot use outside
-      // If we use outside also, for each rerender favouritesData will change.
-      // Therefore we have to use useState();
-      const genresData = favouritesData.map(data => data.genre_ids[0]);
-      console.log(new Set(genres));
-      // new Set(genres) will give unique id of movies.
-      setGenres(Array.from(new Set(genresData)));
-      // Array.from(new Set(genres)) will give array having unique genre ids.
-      setFavourites(favouritesData);
-      setFilteredFavourites(favouritesData);
-      }, []);
+   
+    const MovieFavourites = () => {
+        const { originalFavourites,
+          filteredFavourites,
+          genres,
+          selectedGenreId,
+        } = useSelector((state) => state.watchList);
+
+        const dispatch = useDispatch();
+     
+
+
+     
       // Genre selection.
       const handleGenreSelection = (e) => {
         const id = e.target.dataset.id;
-        setSelectedGenreId(id);
+        dispatch(setSelectedGenreId(id));
       }
      // filter the favourites based on Genre
      //!selectedGenreId (All Genre)
       useEffect(() => {
-        setFilteredFavourites(() => {
-            return favourites.filter(movie => 
-        !selectedGenreId || movie.genre_ids[0] == selectedGenreId);
-        })
-      }, [selectedGenreId, favourites]);
+       dispatch(filterWatchList());
+      }, [selectedGenreId, originalFavourites]);
 
      // function for Movie search
       const handleMovieSearch = (e) => {
         const text = e.target.value;
-        setFilteredFavourites(() => {
-            return favourites.filter((movie) => 
-            movie.title.toLowerCase().includes(text.toLowerCase())
-            );
-         })
+        dispatch(searchWatchList(text));
       }
 
        const handlePopularitySorting = (e) => {
        const sortingType = e.target.dataset.type;
-       setFilteredFavourites(() => {
-        if(!sortingType) {
-            return favourites;
-        }
-        return [...favourites].sort((a, b) => {
-            return sortingType === "ASC"
-            ? a.popularity - b.popularity
-            : b.popularity - a.popularity;
-        });
-       });
+       dispatch(sortWatchList(sortingType));
        };
 
        const handleMovieDeletion = (movieId) => (e) => {
-       setFavourites((prevFavourites) => {
-       const movieIdx = prevFavourites.findIndex(fav => fav.id == movieId);
-       const finalFav = [...prevFavourites];
-       finalFav.splice(movieIdx, 1);
-       localStorage.setItem("favourites", JSON.stringify(finalFav));
-       return finalFav;
-        })
+       dispatch(removeFromWatchList(movieId));
        }
 
      return (
@@ -159,6 +134,6 @@ const MovieFavourites = () => {
             </div>
        
     )
-}
+    }
 
 export default MovieFavourites;

@@ -52,7 +52,7 @@ const AddMovie = () => {
             nameRef.current.style.border = "1px solid red";
             validationRef.current.innerText = "Please enter min 3 char";
             validationRef.current.style.fontSize = "11px";
-            validationRef.current.style.color = "red";
+            validationRef.current.style.color = "blueviolet";
             }
            }
 

@@ -1,23 +1,24 @@
 import Heading from "./Heading";
 import MovieCard from "./MovieCard";
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Pagination from "./Pagination";
 import { useMemo } from 'react'; 
+import { useDispatch, useSelector } from "react-redux";
+import { setMovies } from "../reducers/movieList.reducer";
+
 
 
 // here we are using call back in usestate because after rerender usestate will go to empty array.
 // we are initialized with local storage favourite movies.
 const MovieList = () => {
-    const [movies, setMovies] = useState([]);
-    const [watchlist, updateWatchlist] = useState(() =>{
-      const favouritesData = localStorage.getItem("favourites") || "[]"; 
-      return(JSON.parse(favouritesData)); // intial value of watchlist.
-    });// array of all  movie ids
+  const dispatch = useDispatch();
+  const movies = useSelector((state) => state.movies.list);
+
 
     const fetchMovies = (pageNo) => {
         fetch(`https://api.themoviedb.org/3/movie/popular?api_key=9f48a5b363c49e0c31bf3d09bb319827&page=${pageNo}`)
             .then(res => res.json())
-            .then(data => setMovies(data.results || []));
+            .then(data => dispatch(setMovies(data.results || [])));
       }
 
       const popularMovieCount = useMemo(() => movies.filter((movie) => {
@@ -29,22 +30,21 @@ const MovieList = () => {
         fetchMovies(1);
     }, []);
 
-    
-
-  return (
+    return (
 <>
-<Heading />
-<p>Total Watchlist: {watchlist.length}</p>
-<p>Popular movies (>1000) : {popularMovieCount}</p>
-<div className="movie-list">
-        {!movies.length && <h1>Loading...</h1>}
+     <Heading />
+     
+     <p>Popular movies (>1000): {popularMovieCount}</p>
+
+     <div className="movie-list">
+     {!movies.length && <h1>Loading...</h1>}
         {
             movies?.map(movie => (
-                <MovieCard movie={movie} onWatchlistUpdate={updateWatchlist} watchlist={watchlist}/>
+     <MovieCard movie={movie} />
             ))
         }
-     
     </div>
+    
     <Pagination onPageChange={fetchMovies} />
 </>
    

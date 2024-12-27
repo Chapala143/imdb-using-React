@@ -1,14 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+
 import reportWebVitals from './reportWebVitals';
-import MovieApp from './Components/MovieApp';
+import MovieApp from './components/MovieApp';
+import { Provider } from 'react-redux'
+import { store } from './store/store';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <MovieApp />
+  <Provider store={store}>
+   <MovieApp />
+  </Provider>
+  
       // <App />
 );
 

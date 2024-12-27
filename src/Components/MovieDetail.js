@@ -13,7 +13,7 @@ const MovieDetail = () => {
         .then((res) => res.json())
         .then((data) => setMovieDetail(data));
     }, []);
-
+     console.log(movieDetail);
     return (
         <>
         <h1>Movie Details</h1>
